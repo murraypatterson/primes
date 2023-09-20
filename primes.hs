@@ -1,10 +1,10 @@
 import System.Environment
 
--- all factors of a number, including itself
+-- list of all factors of a number, including itself
 factors :: Int -> [Int]
 factors n = [x | x <- [1..n], mod n x == 0]
 
--- whether or not a number is prime
+-- True if a number is prime else False
 isprime :: Int -> Bool
 isprime n = factors n == [1,n]
 

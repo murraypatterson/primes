@@ -2,43 +2,21 @@
 
 i=100 # increment
 m=10000 # max
+
 ghc primes.hs # compile haskell script into executable
+rm -f naive.txt sieve.txt
 
-# "verify" if the two sequences are identical (up to m, anyway)
-function verify {
+echo "n primes : runtime of sieve / runtime of naive way"
+echo "---"
 
-    rm -f naive.txt sieve.txt
+for n in `seq $i $i $m`
+do
+    { time -p ./primes $n p >> naive.txt ; } 2> naive.time
+    { time -p ./primes $n s >> sieve.txt ; } 2> sieve.time
 
-    for n in `seq $i $i $m`
-    do
-	./primes $n p >> naive.txt
-	./primes $n s >> sieve.txt
-    done
+    cat naive.time sieve.time | tr '\n' ' ' \
+	| awk -v n=$n '{a = $4 + $6; b = $10 + $12; print n " : " b/a}'
+done
 
-    diff naive.txt sieve.txt
-    rm naive.txt sieve.txt
-}
-
-# run a time trial of the naive way against the sieve way
-function timetrial {
-
-    for n in `seq $i $i $m`
-    do
-	# naive way
-	{ time -p ./primes $n p > /dev/null 2>&1 ; } 2> time.txt
-	printf "naive "
-	cat time.txt | tr '\n' ' '
-
-	# sieve way
-	{ time -p ./primes $n p > /dev/null 2>&1 ; } 2> time.txt	
-	printf "sieve "
-	cat time.txt | tr '\n' ' '
-
-	echo
-    done > comp.txt
-}
-
-# Main
-
-verify # verify identity
-timetrial # compare runtimes
+diff naive.txt sieve.txt # sanity check
+rm -f naive.txt sieve.txt
